@@ -8,6 +8,7 @@ grid, not as a linear list, with arrow-key cursor navigation.
 from __future__ import annotations
 
 import time
+from typing import ClassVar
 
 from textual.app import ComposeResult
 from textual.containers import Grid, ScrollableContainer, Vertical
@@ -25,7 +26,7 @@ from percolate.widgets import NAV_HINT, apply_time_of_day, format_remaining
 class BeanPickerScreen(ModalScreen[str | None]):
     """Modal: pick a bean strain (from owned seeds) to plant in the selected plot."""
 
-    BINDINGS = [("escape", "cancel", "Cancel")]
+    BINDINGS: ClassVar[list[tuple[str, str, str]]] = [("escape", "cancel", "Cancel")]
 
     def __init__(self, options: list[tuple[str, str]]) -> None:
         super().__init__()
@@ -34,7 +35,9 @@ class BeanPickerScreen(ModalScreen[str | None]):
     def compose(self) -> ComposeResult:
         with Vertical(id="picker"):
             yield Label("Choose a seed to plant  (esc to cancel)")
-            yield FocusHighlightOptionList(*[Option(label, id=opt_id) for opt_id, label in self._options])
+            yield FocusHighlightOptionList(
+                *[Option(label, id=opt_id) for opt_id, label in self._options]
+            )
 
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
         self.dismiss(event.option.id)
@@ -68,7 +71,7 @@ class FarmScreen(Screen):
     # sub_title unset keeps inheriting the gold readout from PercolateApp.
     TITLE = "Farm"
 
-    BINDINGS = [
+    BINDINGS: ClassVar[list[tuple[str, str, str]]] = [
         ("up", "move_up", "Up"),
         ("down", "move_down", "Down"),
         ("left", "move_left", "Left"),
@@ -111,7 +114,9 @@ class FarmScreen(Screen):
         apply_time_of_day(self.query_one("#tint_bar", Static))
 
     def _render_backdrop(self) -> None:
-        tier_by_slot = resolve_tiers(self.app.farmhouse_data, self.app.farm, self.app.upgrades_data)
+        tier_by_slot = resolve_tiers(
+            self.app.farmhouse_data, self.app.farm, self.app.upgrades_data
+        )
         composited = composite_backdrop(self.app.farmhouse_data, tier_by_slot)
         self.query_one("#backdrop", Backdrop).update(composited)
 
@@ -317,7 +322,9 @@ class FarmScreen(Screen):
                 bonus = farm.growth_speed_bonus(self.app.upgrades_data)
                 growth_time = bean.growth_time * (1 - bonus)
                 try:
-                    farm.plant_bean(plot_index, bean, time.time(), growth_time=growth_time)
+                    farm.plant_bean(
+                        plot_index, bean, time.time(), growth_time=growth_time
+                    )
                     farm.save_to_disk()
                 except ValueError as exc:
                     self.notify(str(exc), severity="error")
@@ -336,7 +343,8 @@ class FarmScreen(Screen):
                 self._render_backdrop()
 
         self.app.push_screen(
-            UpgradeModal("Farm Upgrades", ["plot_expansion", "soil_quality"]), handle_result
+            UpgradeModal("Farm Upgrades", ["plot_expansion", "soil_quality"]),
+            handle_result,
         )
 
     def action_toggle_outline(self) -> None:
@@ -347,5 +355,9 @@ class FarmScreen(Screen):
         # _highlight_cursor's own "cursor" class logic doesn't need to
         # change at all.
         self._hide_outline = not self._hide_outline
-        self.query_one("#field", Grid).set_class(self._hide_outline, "hide-cursor-outline")
-        self.notify("Plot outline hidden" if self._hide_outline else "Plot outline shown")
+        self.query_one("#field", Grid).set_class(
+            self._hide_outline, "hide-cursor-outline"
+        )
+        self.notify(
+            "Plot outline hidden" if self._hide_outline else "Plot outline shown"
+        )

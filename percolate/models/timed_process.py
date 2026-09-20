@@ -36,5 +36,5 @@ class TimedProcess:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict) -> "TimedProcess":
+    def from_dict(cls, data: dict) -> TimedProcess:
         return cls(started_at=data["started_at"], duration=data["duration"])
