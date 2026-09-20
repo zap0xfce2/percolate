@@ -70,7 +70,7 @@ These rewind timer start times rather than touching the system clock, so they on
 task build
 ```
 
-This is how the [Releases](../../releases) builds are produced. Nuitka can't cross-compile, so build on whichever OS you want an executable for. `task build` compiles `percolate/main.py` with Nuitka in `--mode=onefile`, producing a single self-contained executable at `dist/<os>/percolate` (`percolate.exe` on Windows) — nothing else to ship. Unlike PyInstaller, Nuitka compiles through a real C compiler, so building requires one to be installed; Nuitka can also fetch its own (e.g. via the `ziglang` PyPI package) if none is found on the system.
+This is how the [Releases](../../releases) builds are produced. Nuitka can't cross-compile, so build on whichever OS you want an executable for. `task build` compiles `percolate/main.py` with Nuitka in `--mode=onefile`, producing a single self-contained executable at `dist/<os>/percolate` (`percolate.exe` on Windows) — nothing else to ship. Unlike PyInstaller, Nuitka compiles through a real C compiler, so building requires one to be installed (gcc/clang on Linux/macOS, MSVC Build Tools or MinGW64 on Windows — Nuitka can auto-install MinGW64 on Windows if none is found); it can also fetch its own via the `ziglang` PyPI package.
 
 On first launch, the executable unpacks its bundled data/CSS/runtime into a per-version cache directory and reuses it on later launches (rather than re-unpacking every time) for faster repeated startup.
 
