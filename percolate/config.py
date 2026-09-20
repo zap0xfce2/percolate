@@ -16,10 +16,10 @@ CONFIG_DIR = Path.home() / ".config" / "percolate"
 STATE_PATH = CONFIG_DIR / "state.json"
 
 # Bundled content registries (JSON), shipped alongside the package. In dev,
-# that's just this file's directory. The Nuitka onefile executable is named
-# `percolate` (see build.sh/build.ps1), which collides with a same-named
-# on-disk mirror of this package, so the standalone build instead ships
-# data/CSS flat next to the built executable — found here via sys.executable.
+# that's just this file's directory. The Nuitka executable is named
+# `percolate` (see Taskfile.yaml), which collides with a same-named on-disk
+# mirror of this package, so the standalone build instead ships data/CSS
+# flat next to the built executable — found here via sys.executable.
 if "__compiled__" in globals():
     PACKAGE_DIR = Path(sys.executable).resolve().parent
 else:
