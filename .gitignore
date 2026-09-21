@@ -9,3 +9,6 @@ dist/
 docs/
 CLAUDE.md
 .ruff_cache
+.claude
+.serena
+.superpowers
