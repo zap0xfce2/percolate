@@ -36,6 +36,7 @@ from percolate.config import UI_TICK_SECONDS
 from percolate.focus_widgets import (
     FocusHighlightOptionList,
     FocusHighlightSelectionList,
+    grid_neighbor,
 )
 from percolate.models.roast import DEFAULT_ROAST_DURATION, resolve_roast
 from percolate.screens.upgrade_modal import UpgradeModal
@@ -77,7 +78,17 @@ class RoastScreen(Screen):
     # See FarmScreen.TITLE.
     TITLE = "Roasting"
 
+    # Arrow-key order of the builder fields, top to bottom.
+    _NAV_GRID: ClassVar[list[list[str]]] = [
+        ["bean_list"],
+        ["flavor_list"],
+        ["level_list"],
+        ["start_button"],
+    ]
+
     BINDINGS: ClassVar[list[tuple[str, str, str]]] = [
+        ("up", "focus_neighbor(-1)", "Previous field"),
+        ("down", "focus_neighbor(1)", "Next field"),
         ("s", "start_roast", "Start Roast"),
         ("c", "collect_ready", "Collect"),
         ("u", "show_upgrades", "Upgrades"),
@@ -93,7 +104,8 @@ class RoastScreen(Screen):
                 # the builder panel's 4 fields rely on Textual's default
                 # Tab-cycling focus, which isn't obvious to a non-dev player.
                 yield Static(
-                    "(tab) next field   (shift+tab) previous", classes="section-hint"
+                    "(tab / down) next field   (shift+tab / up) previous",
+                    classes="section-hint",
                 )
                 yield Label("Bean", classes="builder-heading")
                 yield FocusHighlightOptionList(id="bean_list")
@@ -146,6 +158,12 @@ class RoastScreen(Screen):
             self._sync_selection_highlight(event.widget.id)
 
     # --- Builder (left panel) -------------------------------------------
+
+    def action_focus_neighbor(self, d_row: int) -> None:
+        focused_id = self.focused.id if self.focused else None
+        target_id = grid_neighbor(self._NAV_GRID, focused_id, d_row, 0)
+        if target_id:
+            self.set_focus(self.query_one(f"#{target_id}"))
 
     def _sync_selection_highlight(self, widget_id: str) -> None:
         if widget_id == "bean_list":
